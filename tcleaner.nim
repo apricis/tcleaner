@@ -1,8 +1,8 @@
 import nre, parseopt2, streams, strutils, typetraits
 
-let PUNCTUATION_RE: Regex = re"(…|”|“|„|§|\x22|«|»| - |–|—|[,._\[\]:\)\(/\\;\!\?\=]+|[-]{2,})"
+let PUNCTUATION_RE: Regex = re"(\x22|…|–|—| - |”|“|„|«|»|§|[,._\[\]:\)\(/\\;\!\?\=]+|[-]{2,})"
 
-let FORMATTING_RE: Regex = re"((\xcc\x81)|•||%|®|[\^\*]+)"
+let FORMATTING_RE: Regex = re"((\xcc\x81)||||■|©|•|®|%|[\^\*]+)"
 
 let NUMBERS_RE: Regex = re"[0-9]+"
 
@@ -10,14 +10,15 @@ let SPACES_RE: Regex = re"[ ]+"
 
 const helptext: string = """
 tcleaner - clean raw text from special characters
-Usage: tcleaner [-t] [-h] [-fp] < file > outfile
+Usage: tcleaner [-h] [-fp] [-fn] [-l] [-cp] [-f] < file > outfile
 
 Options:
--h\tShow this help text
--fp\tFilter out all punctuation
--fn\tFilter out all numbers
--l\tConvert to lowercase
--cp\tCorrect paragraphs
+-h     Show this help text
+-fp    Filter out all punctuation
+-fn    Filter out all numbers
+-l     Convert to lowercase
+-cp    Correct paragraphs
+-f     Filter formatting
 """
 
 proc writeHelp() =
@@ -47,7 +48,6 @@ proc cleanText(input: Stream, filterPunctuation: bool, filterNumbers: bool,
 
 when isMainModule:
     var
-        tokenize: bool = false
         run: bool = true
         filterPunctuation: bool = false
         filterNumbers: bool = false
@@ -58,8 +58,6 @@ when isMainModule:
         case kind
         of cmdLongOption, cmdShortOption:
             case key
-            of "tokenize", "t":
-                tokenize = true
             of "help", "h":
                 writeHelp()
                 run = false
